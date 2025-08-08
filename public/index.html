@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <h1>ランキング一覧</h1>
+  <ul id="rankingList"></ul>
+
+  <script>
+    fetch('https://api.octagon-api.com/rankings')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        const list = document.getElementById('rankingList');
+
+        data.forEach(category => {
+          // 階級名とチャンピオン名を表示
+          const categoryHeader = document.createElement('h2');
+          categoryHeader.textContent = category.categoryName + ' - Champion: ' + category.champion.championName;
+          list.appendChild(categoryHeader);
+
+          // 選手リストを作る
+          const fightersList = document.createElement('ul');
+          category.fighters.forEach(fighter => {
+            const li = document.createElement('li');
+            li.textContent = fighter.name;
+            fightersList.appendChild(li);
+          });
+
+          list.appendChild(fightersList);
+        });
+      })
+      .catch(err => {
+        console.error('Fetch error:', err);
+        const list = document.getElementById('rankingList');
+        list.textContent = 'ランキング情報の取得に失敗しました。';
+      });
+  </script>
+</body>
+
+</html>
