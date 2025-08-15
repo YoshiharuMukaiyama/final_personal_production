@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // Fighter型
 type Fighter = {
@@ -14,7 +15,7 @@ type QuestionProps = {
   question: string;
   options: string[];
   correctAnswer: string;
-  onNext: () => void;
+  onNext: (isCorrect: boolean) => void; // 正誤を渡す
 };
 
 const Question: React.FC<QuestionProps> = ({
@@ -68,8 +69,9 @@ const Question: React.FC<QuestionProps> = ({
           <p>{isCorrect ? "✅ 正解！" : `❌ 不正解... 正解は ${correctAnswer}`}</p>
           <button
             onClick={() => {
-              onNext();
+              onNext(isCorrect); // 正誤を渡す
               setIsAnswered(false);
+              setSelected(null);
             }}
             style={{
               marginTop: "1rem",
@@ -84,9 +86,8 @@ const Question: React.FC<QuestionProps> = ({
             次の問題へ
           </button>
         </>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 };
 
@@ -95,6 +96,10 @@ export function QuizPlay() {
   const [fighters, setFighters] = useState<Fighter[]>([]);
   const [current, setCurrent] = useState<Fighter | null>(null);
   const [options, setOptions] = useState<string[]>([]);
+  const [count, setCount] = useState(0);
+  const [results, setResults] = useState<{ question: string; isCorrect: boolean }[]>([]);
+
+  const navigate = useNavigate();
 
   // API取得
   useEffect(() => {
@@ -102,7 +107,6 @@ export function QuizPlay() {
       const res = await axios.get("https://api.octagon-api.com/fighters");
       const data = res.data;
 
-      // 型アサーションで unknown → any に変換してから filter
       const filtered: Fighter[] = Object.values(data as Record<string, any>)
         .filter((f: any) =>
           !f.category.toLowerCase().includes("women") &&
@@ -143,6 +147,23 @@ export function QuizPlay() {
     setOptions(shuffled);
   };
 
+  // 正誤処理 & 次の問題へ
+  const handleNext = (isCorrect: boolean) => {
+    if (!current) return;
+
+    setResults((prev) => [
+      ...prev,
+      { question: `${current.name} のニックネームはどれ？`, isCorrect },
+    ]);
+
+    if (count + 1 >= 10) {
+      navigate("/quiz/result", { state: { results: [...results, { question: `${current.name} のニックネームはどれ？`, isCorrect }] } });
+    } else {
+      setCount((prev) => prev + 1);
+      makeQuestion();
+    }
+  };
+
   // 初回問題生成
   useEffect(() => {
     if (fighters.length > 0) {
@@ -159,7 +180,7 @@ export function QuizPlay() {
           question={`${current.name} のニックネームはどれ？`}
           options={options}
           correctAnswer={current.nickname}
-          onNext={makeQuestion}
+          onNext={handleNext}
         />
       </div>
       <img
