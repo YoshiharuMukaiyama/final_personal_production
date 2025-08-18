@@ -3,9 +3,23 @@ import { Link } from 'react-router-dom';
 
 export const QuizHome: React.FC = () => {
   return (
-    <div>
-      <h1>Quiz Home Page</h1>
-      <Link to="/quiz/play">クイズスタート</Link>
+    <div style={{ textAlign: 'left', paddingLeft: '20px' }}>
+      <h1>Fighter Nickname Quiz</h1>
+      <Link
+        to="/quiz/play"
+        style={{
+          display: 'inline-block',
+          padding: '10px 20px',
+          backgroundColor: '#435d86ff',
+          color: '#fff',
+          textDecoration: 'none',
+          borderRadius: '5px',
+          fontWeight: 'bold',
+          marginTop: '10px',
+        }}
+      >
+        クイズスタート
+      </Link>
     </div>
   );
 };

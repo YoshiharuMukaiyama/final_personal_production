@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  padding-top: 60px;
+  /* ヘッダー高さ分の余白 */
 }
 
 .App-logo {
@@ -15,7 +17,8 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: calc(100vh - 60px);
+  /* ヘッダー分を引いた高さ */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,6 +35,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

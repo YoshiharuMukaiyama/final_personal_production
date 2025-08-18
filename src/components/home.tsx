@@ -75,7 +75,7 @@ export function Home() {
 
         return (
           <div key={category} style={{ marginBottom: "1.5rem" }}>
-            <h2>{category}</h2>
+            <h2 style={{ textAlign: "left", marginLeft: "8px" }}>{category}</h2>
             <ul style={{ listStyle: "none", paddingLeft: 0 }}>
               {fighters.map((f, idx) => (
                 <li

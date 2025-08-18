@@ -9,13 +9,24 @@ export function QuizResult() {
     <div style={{ padding: "1rem" }}>
       <h2>結果</h2>
       <p>正解数: {results.filter((r: any) => r.isCorrect).length} / {results.length}</p>
-      <ul>
+      <ul style={{ listStyle: "none", padding: 0, maxWidth: "500px", margin: "0 auto" }}>
         {results.map((r: any, idx: number) => (
-          <li key={idx}>
-            Q{idx + 1}: {r.question} → {r.isCorrect ? "✅ 正解" : "❌ 不正解"}
+          <li
+            key={idx}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "0.5rem",
+            }}
+          >
+            <span>{`Q${idx + 1}: ${r.question}`}</span>
+            <span>{r.isCorrect ? "✅" : "❌"}</span>
           </li>
         ))}
       </ul>
+
+
+
       <button
         onClick={() => navigate("/quiz/play")}
         style={{

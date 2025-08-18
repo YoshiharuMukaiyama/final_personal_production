@@ -24,7 +24,6 @@ export function Analysis() {
     }));
   };
 
-  // 選択値に対応するコンポーネントマップ
   const componentMap: { [key: string]: React.ReactNode } = {
     '1-1': <WinningRateByAge />,
     '2-1': <CountByAge />,
@@ -37,28 +36,69 @@ export function Analysis() {
   };
 
   return (
-    <div>
-      <div>
-        <label htmlFor="dropdown">縦軸: </label>
-        <select id="dropdown" value={selectedAxes.vertical} onChange={handleChange('vertical')}>
-          <option value="1">勝率</option>
-          <option value="2">人数</option>
-        </select>
+    <div style={{ padding: '20px' }}>
+      {/* 選択パネル */}
+      <div style={panelStyle}>
+        {/* 横軸を先に表示 */}
+        <div style={axisControlStyle}>
+          <label style={labelStyle}>x軸</label>
+          <select
+            value={selectedAxes.horizontal}
+            onChange={handleChange('horizontal')}
+            style={selectStyle}
+          >
+            <option value="1">年齢</option>
+            <option value="2">バックボーン</option>
+            <option value="3">出身国</option>
+            <option value="4">所属ジム</option>
+          </select>
+        </div>
+
+        {/* 縦軸を後に表示 */}
+        <div style={axisControlStyle}>
+          <label style={labelStyle}>y軸</label>
+          <select
+            value={selectedAxes.vertical}
+            onChange={handleChange('vertical')}
+            style={selectStyle}
+          >
+            <option value="1">勝率</option>
+            <option value="2">人数</option>
+          </select>
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="dropdown">横軸: </label>
-        <select id="dropdown" value={selectedAxes.horizontal} onChange={handleChange('horizontal')}>
-          <option value="1">年齢</option>
-          <option value="2">バックボーン</option>
-          <option value="3">出身国</option>
-          <option value="4">所属ジム</option>
-        </select>
-      </div>
-
-      <div>
+      {/* グラフ表示部分 */}
+      <div style={{ marginTop: '30px' }}>
         {componentMap[`${selectedAxes.vertical}-${selectedAxes.horizontal}`] || null}
       </div>
     </div>
   );
 }
+
+// --- スタイル ---
+const panelStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: '40px',
+  backgroundColor: '#374151', // ダークグレーで見やすく
+  padding: '15px 20px',
+  // borderRadius: '12px', ← 削除
+  color: '#fff',
+  alignItems: 'center',
+};
+
+const axisControlStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+const labelStyle: React.CSSProperties = {
+  marginBottom: '5px',
+  fontWeight: 600,
+};
+
+const selectStyle: React.CSSProperties = {
+  padding: '8px',
+  // borderRadius: '6px', ← 削除
+  border: '1px solid #ccc',
+};

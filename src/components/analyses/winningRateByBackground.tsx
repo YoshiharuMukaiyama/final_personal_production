@@ -21,14 +21,12 @@ type Fighter = {
 };
 
 export const WinningRateByBackground = () => {
-  const [fightersStats, setFightersStats] = useState<Fighter[]>([]);
   const [averageByBackground, setAverageByBackground] = useState<{ background: string; averageWinningRate: number; count: number }[]>([]);
 
   useEffect(() => {
     axios.get('https://api.octagon-api.com/fighters')
       .then(response => {
-        const dataObj = response.data;
-        const fightersArray = Object.values(dataObj) as Fighter[];
+        const fightersArray = Object.values(response.data) as Fighter[];
 
         const stats = fightersArray.map(fighter => {
           const wins = Number(fighter.wins);
@@ -45,61 +43,60 @@ export const WinningRateByBackground = () => {
             .replace(/^Grappler$/i, 'Grappling');
 
           return {
-            wins: fighter.wins,
-            losses: fighter.losses,
             fightingStyle: style,
             winningRate: wins + losses > 0 ? wins / (wins + losses) : 0,
           };
         });
 
-        setFightersStats(stats);
-
-        // バックグラウンド別平均勝率計算
         const backgroundGroups: { [background: string]: { totalRate: number; count: number } } = {};
-
         stats.forEach(fighter => {
-          const background = fighter.fightingStyle || '不明';
-          if (!backgroundGroups[background]) {
-            backgroundGroups[background] = { totalRate: 0, count: 0 };
-          }
+          const background = fighter.fightingStyle || 'Others';
+          if (!backgroundGroups[background]) backgroundGroups[background] = { totalRate: 0, count: 0 };
           backgroundGroups[background].totalRate += fighter.winningRate ?? 0;
           backgroundGroups[background].count += 1;
         });
 
-        const averageData = Object.entries(backgroundGroups).map(([background, { totalRate, count }]) => ({
-          background,
-          averageWinningRate: count > 0 ? totalRate / count : 0,
-          count
-        })).sort((a, b) => {
-          if (a.background === 'Others') return 1;
-          if (b.background === 'Others') return -1;
-          return b.averageWinningRate - a.averageWinningRate; // 降順
-        });
+        const averageData = Object.entries(backgroundGroups)
+          .map(([background, { totalRate, count }]) => ({
+            background,
+            averageWinningRate: count > 0 ? totalRate / count : 0,
+            count
+          }))
+          .sort((a, b) => {
+            if (a.background === 'Others') return 1;
+            if (b.background === 'Others') return -1;
+            return b.averageWinningRate - a.averageWinningRate;
+          });
 
         setAverageByBackground(averageData);
       })
-      .catch(error => {
-        console.error('API取得エラー:', error);
-      });
+      .catch(error => console.error('API取得エラー:', error));
   }, []);
 
-  // グラフ用データ作成
   const chartData = {
     labels: averageByBackground.map(item => item.background),
     datasets: [
       {
         label: 'バックグラウンド別平均勝率',
         data: averageByBackground.map(item => Number(item.averageWinningRate.toFixed(3))),
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        backgroundColor: '#435d86ff',
+        borderColor: '#435d86ff',
+        borderWidth: 1,
       },
     ],
   };
 
   const options = {
+    layout: { padding: { top: 20, bottom: 20, left: 30, right: 30 } },
     scales: {
       y: {
         min: 0.6,
         max: 1,
+        title: {
+          display: true,
+          text: '勝率',   // 縦軸ラベル
+          font: { size: 14 },
+        },
         ticks: {
           stepSize: 0.1,
           callback: function (this: any, tickValue: string | number) {
@@ -108,17 +105,32 @@ export const WinningRateByBackground = () => {
           },
         },
       },
-    },
-    plugins: {
-      legend: {
-        display: false,  // 凡例は非表示のまま
+      x: {
+        title: {
+          display: true,
+          text: 'バックボーン',
+          font: { size: 14 },
+        },
       },
     },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function (context: any) {
+            const index = context.dataIndex;
+            const item = averageByBackground[index];
+            return `平均勝率: ${(item.averageWinningRate * 100).toFixed(1)}%, 人数: ${item.count}`;
+          },
+        },
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false,
   };
 
   return (
-    <div>
-      <h2>バックボーン別平均勝率グラフ</h2>
+    <div style={{ width: '90vw', height: '70vh', margin: '0 auto' }}>
       <Bar data={chartData} options={options} />
     </div>
   );

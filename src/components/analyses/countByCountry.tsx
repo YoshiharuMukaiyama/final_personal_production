@@ -20,12 +20,10 @@ type Fighter = {
 };
 
 export const CountByCountry = () => {
-  // 国別の人数と平均勝率を保存する状態
   const [countByCountryData, setCountByCountryData] = useState<
     { country: string; count: number; averageWinningRate: number }[]
   >([]);
 
-  // placeOfBirthから国名を抽出（カンマで区切って最後の部分を国名と想定）
   const extractCountry = (place: string): string => {
     if (!place) return 'Others';
     const parts = place.split(',');
@@ -39,10 +37,7 @@ export const CountByCountry = () => {
         const dataObj = response.data;
         const fightersArray = Object.values(dataObj) as Fighter[];
 
-        // 国別の合計勝率・人数を集計するオブジェクト
-        const statsByCountry: {
-          [country: string]: { totalWinningRate: number; count: number };
-        } = {};
+        const statsByCountry: { [country: string]: { totalWinningRate: number; count: number } } = {};
 
         fightersArray.forEach(fighter => {
           const wins = Number(fighter.wins);
@@ -51,14 +46,12 @@ export const CountByCountry = () => {
 
           const country = extractCountry(fighter.placeOfBirth || '');
 
-          if (!statsByCountry[country]) {
-            statsByCountry[country] = { totalWinningRate: 0, count: 0 };
-          }
+          if (!statsByCountry[country]) statsByCountry[country] = { totalWinningRate: 0, count: 0 };
+
           statsByCountry[country].totalWinningRate += winningRate;
           statsByCountry[country].count += 1;
         });
 
-        // 平均勝率を計算し、配列に変換
         const countArray = Object.entries(statsByCountry)
           .map(([country, { totalWinningRate, count }]) => ({
             country,
@@ -68,50 +61,55 @@ export const CountByCountry = () => {
           .sort((a, b) => {
             if (a.country === 'Others') return 1;
             if (b.country === 'Others') return -1;
-            // 平均勝率の降順でソート
             return b.averageWinningRate - a.averageWinningRate;
-          }).slice(0, 20);
+          })
+          .slice(0, 20);
 
         setCountByCountryData(countArray);
       })
-      .catch(error => {
-        console.error('API取得エラー:', error);
-      });
+      .catch(error => console.error(error));
   }, []);
 
-  // 最大人数（Y軸max設定用）
-  const maxCount = countByCountryData.length > 0 ? Math.max(...countByCountryData.map(item => item.count)) : 10;
+  const maxCount = countByCountryData.length > 0
+    ? Math.max(...countByCountryData.map(item => item.count))
+    : 10;
 
-  // グラフ用データ作成（人数を棒グラフで表示）
   const chartData = {
     labels: countByCountryData.map(item => item.country),
     datasets: [
       {
         label: '人数',
         data: countByCountryData.map(item => item.count),
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        backgroundColor: '#435d86ff',
+        borderColor: '#435d86ff',
+        borderWidth: 1,
       },
     ],
   };
 
-  // オプション設定（人数に合わせてY軸を調整）
   const options = {
+    layout: { padding: { top: 30, bottom: 30, left: 50, right: 50 } },
     scales: {
       y: {
         min: 0,
-        max: maxCount + 5, // 少し余裕をもたせる
-        ticks: {
-          stepSize: 5,
-          callback: function (this: any, tickValue: string | number) {
-            return tickValue;
-          },
+        max: maxCount + 5,
+        title: {
+          display: true,
+          text: '人数', // 縦軸ラベル
+          font: { size: 14 },
+        },
+        ticks: { stepSize: 5 },
+      },
+      x: {
+        title: {
+          display: true,
+          text: '出身国',
+          font: { size: 14 },
         },
       },
     },
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
       tooltip: {
         callbacks: {
           label: function (context: any) {
@@ -122,11 +120,12 @@ export const CountByCountry = () => {
         },
       },
     },
+    responsive: true,
+    maintainAspectRatio: false,
   };
 
   return (
-    <div>
-      <h2>国別人数グラフ</h2>
+    <div style={{ width: '90vw', height: '70vh', margin: '0 auto' }}>
       <Bar data={chartData} options={options} />
     </div>
   );

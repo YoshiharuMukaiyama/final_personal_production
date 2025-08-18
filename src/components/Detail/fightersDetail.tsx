@@ -57,31 +57,41 @@ export function FighterDetail() {
 
   return (
     <div style={{ padding: "1rem", maxWidth: "800px", margin: "0 auto" }}>
-      <h1>{fighter.name}</h1>
-      {fighter.nickname && <h3>({fighter.nickname})</h3>}
+      <h1 style={{ textAlign: "left" }}>{fighter.name}</h1>
+      {fighter.nickname && <h3 style={{ textAlign: "left" }}>({fighter.nickname})</h3>}
 
       <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-        {/* テキスト情報 */}<ul style={{ listStyle: "none", paddingLeft: 0, flex: 1 }}>
-          <li><strong>Category:</strong> {fighter.category}</li>
-          <li><strong>Fight Record:</strong> {fighter.wins}-{fighter.losses}-{fighter.draws}</li>
-          <li><strong>Place of Birth:</strong> {fighter.placeOfBirth}</li>
-          <li><strong>Training Facility:</strong> {fighter.trainsAt}</li>
-          <li><strong>Age:</strong> {fighter.age}</li>
-          <li>
-            <strong>Height:</strong> {fighter.height}" {(Number(fighter.height) * 2.54).toFixed(1)} cm
-          </li>
-          <li>
-            <strong>Reach:</strong> {fighter.reach}" {(Number(fighter.reach) * 2.54).toFixed(1)} cm
-          </li>
-          <li>
-            <strong>Leg Reach:</strong> {fighter.legReach}" {(Number(fighter.legReach) * 2.54).toFixed(1)} cm
-          </li>
-          <li>
-            <strong>Weight:</strong> {fighter.weight} lbs {(Number(fighter.weight) / 2.205).toFixed(1)} kg
-          </li>
-          <li><strong>Octagon Debut:</strong> {fighter.octagonDebut}</li>
-          {fighter.fightingStyle && <li><strong>Fighting Style:</strong> {fighter.fightingStyle}</li>}
-          <li><strong>Status:</strong> {fighter.status}</li>
+        {/* テキスト情報 */}
+        <ul style={{ listStyle: "none", paddingLeft: 0, flex: 1 }}>
+          {[
+            { label: "Category", value: fighter.category },
+            { label: "Fight Record", value: `${fighter.wins}-${fighter.losses}-${fighter.draws}` },
+            { label: "Place of Birth", value: fighter.placeOfBirth },
+            { label: "Training Facility", value: fighter.trainsAt },
+            { label: "Age", value: fighter.age },
+            { label: "Height", value: `${fighter.height}" (${(Number(fighter.height) * 2.54).toFixed(1)} cm)` },
+            { label: "Reach", value: `${fighter.reach}" (${(Number(fighter.reach) * 2.54).toFixed(1)} cm)` },
+            { label: "Leg Reach", value: `${fighter.legReach}" (${(Number(fighter.legReach) * 2.54).toFixed(1)} cm)` },
+            { label: "Weight", value: `${fighter.weight} lbs (${(Number(fighter.weight) / 2.205).toFixed(1)} kg)` },
+            { label: "Octagon Debut", value: fighter.octagonDebut },
+            { label: "Fighting Style", value: fighter.fightingStyle },
+            { label: "Status", value: fighter.status },
+          ].map((item, idx) => (
+            item.value && (
+              <li
+                key={idx}
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  textAlign: "left",
+                  marginBottom: "0.25rem",
+                }}
+              >
+                <strong style={{ minWidth: "140px" }}>{item.label}:</strong>
+                <span>{item.value}</span>
+              </li>
+            )
+          ))}
         </ul>
 
         {/* 右端画像 */}

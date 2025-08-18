@@ -20,7 +20,6 @@ type Fighter = {
 };
 
 export const CountByBackground = () => {
-  // バックグラウンドごとの人数と平均勝率を保存する状態
   const [countByBackgroundData, setCountByBackgroundData] = useState<
     { background: string; count: number; averageWinningRate: number }[]
   >([]);
@@ -31,19 +30,14 @@ export const CountByBackground = () => {
         const dataObj = response.data;
         const fightersArray = Object.values(dataObj) as Fighter[];
 
-        // バックグラウンド別の合計勝率・人数を集計するオブジェクト
-        const statsByBackground: {
-          [background: string]: { totalWinningRate: number; count: number };
-        } = {};
+        const statsByBackground: { [background: string]: { totalWinningRate: number; count: number } } = {};
 
         fightersArray.forEach(fighter => {
           const wins = Number(fighter.wins);
           const losses = Number(fighter.losses);
           const winningRate = wins + losses > 0 ? wins / (wins + losses) : 0;
 
-          // fightingStyleの統一（必要に応じて置換追加可）
           let background = fighter.fightingStyle?.trim() || 'Others';
-
           background = background.replace(/^Wrestler$/i, 'Wrestling')
             .replace(/^Brazilian Jiu-Jitsu$/i, 'Jiu-Jitsu')
             .replace(/^Boxer$/i, 'Boxing')
@@ -52,14 +46,12 @@ export const CountByBackground = () => {
             .replace(/^Brawler$/i, 'Brawl')
             .replace(/^Grappler$/i, 'Grappling');
 
-          if (!statsByBackground[background]) {
-            statsByBackground[background] = { totalWinningRate: 0, count: 0 };
-          }
+          if (!statsByBackground[background]) statsByBackground[background] = { totalWinningRate: 0, count: 0 };
+
           statsByBackground[background].totalWinningRate += winningRate;
           statsByBackground[background].count += 1;
         });
 
-        // 平均勝率を計算し、配列に変換
         const countArray = Object.entries(statsByBackground)
           .map(([background, { totalWinningRate, count }]) => ({
             background,
@@ -69,50 +61,54 @@ export const CountByBackground = () => {
           .sort((a, b) => {
             if (a.background === 'Others') return 1;
             if (b.background === 'Others') return -1;
-            // 平均勝率の降順でソート
             return b.averageWinningRate - a.averageWinningRate;
           });
 
         setCountByBackgroundData(countArray);
       })
-      .catch(error => {
-        console.error('API取得エラー:', error);
-      });
+      .catch(error => console.error(error));
   }, []);
 
-  // 最大人数（Y軸max設定用）
-  const maxCount = countByBackgroundData.length > 0 ? Math.max(...countByBackgroundData.map(item => item.count)) : 10;
+  const maxCount = countByBackgroundData.length > 0
+    ? Math.max(...countByBackgroundData.map(item => item.count))
+    : 10;
 
-  // グラフ用データ作成（人数を棒グラフで表示）
   const chartData = {
     labels: countByBackgroundData.map(item => item.background),
     datasets: [
       {
         label: '人数',
         data: countByBackgroundData.map(item => item.count),
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        backgroundColor: '#435d86ff', // 固定色
+        borderColor: '#435d86ff',
+        borderWidth: 1,
       },
     ],
   };
 
-  // オプション設定（人数に合わせてY軸を調整）
   const options = {
+    layout: { padding: { top: 30, bottom: 30, left: 50, right: 50 } },
     scales: {
       y: {
         min: 0,
-        max: maxCount + 5, // 少し余裕をもたせる
-        ticks: {
-          stepSize: 5,
-          callback: function (this: any, tickValue: string | number) {
-            return tickValue;
-          },
+        max: maxCount + 5,
+        title: {
+          display: true,
+          text: '人数', // 縦軸ラベル
+          font: { size: 14 },
+        },
+        ticks: { stepSize: 5 },
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'バックボーン',
+          font: { size: 14 },
         },
       },
     },
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
       tooltip: {
         callbacks: {
           label: function (context: any) {
@@ -123,11 +119,12 @@ export const CountByBackground = () => {
         },
       },
     },
+    responsive: true,
+    maintainAspectRatio: false,
   };
 
   return (
-    <div>
-      <h2>バックボーン別人数グラフ</h2>
+    <div style={{ width: '90vw', height: '70vh', margin: '0 auto' }}>
       <Bar data={chartData} options={options} />
     </div>
   );

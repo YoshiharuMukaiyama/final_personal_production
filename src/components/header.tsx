@@ -9,13 +9,13 @@ export const Header: React.FC = () => {
         <nav>
           <ul style={navListStyle}>
             <li style={navItemStyle}>
-              <Link to="/">Home</Link>
+              <Link to="/" style={linkStyle}>Home</Link>
             </li>
             <li style={navItemStyle}>
-              <Link to="/analysis">Analysis</Link>
+              <Link to="/analysis" style={linkStyle}>Analysis</Link>
             </li>
             <li style={navItemStyle}>
-              <Link to="/quiz">Quiz</Link>
+              <Link to="/quiz" style={linkStyle}>Quiz</Link>
             </li>
           </ul>
         </nav>
@@ -24,17 +24,29 @@ export const Header: React.FC = () => {
   );
 };
 
-// --- 簡単なインラインスタイル ---
+// --- スタイル ---
+const headerHeight = 60; // ヘッダーの高さ(px)
+
 const headerStyle: React.CSSProperties = {
-  backgroundColor: '#1f2937', // ダークグレー
+  position: 'fixed', // 上部に固定
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: `${headerHeight}px`,
+  backgroundColor: '#1f2937',
   color: '#fff',
-  padding: '10px 20px',
+  padding: '0 20px',
+  display: 'flex',
+  alignItems: 'center',
+  zIndex: 1000, // 他の要素より前に表示
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
 };
 
 const containerStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  width: '100%',
 };
 
 const logoStyle: React.CSSProperties = {
@@ -47,8 +59,21 @@ const navListStyle: React.CSSProperties = {
   display: 'flex',
   margin: 0,
   padding: 0,
+  maxWidth: '60%', // 幅制限
+  justifyContent: 'flex-end', // 右寄せ
 };
 
 const navItemStyle: React.CSSProperties = {
   marginLeft: '20px',
 };
+
+const linkStyle: React.CSSProperties = {
+  color: '#fff',
+  textDecoration: 'none',
+  fontSize: '1rem',
+  fontWeight: 500,
+};
+
+// --- bodyに余白を追加してヘッダー下のコンテンツを隠さない ---
+// App.tsx などのルートコンポーネントで
+// <div style={{ paddingTop: `${headerHeight}px` }}>...</div>

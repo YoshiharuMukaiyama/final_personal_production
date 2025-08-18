@@ -13,14 +13,16 @@ export default function App() {
   return (
     <BrowserRouter>
       <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/:fighterSlug" element={<FighterDetail />} />
-        <Route path="/analysis" element={<Analysis />} />
-        <Route path="/quiz" element={<QuizHome />} />
-        <Route path="/quiz/play" element={<QuizPlay />} />
-        <Route path="/quiz/result" element={<QuizResult />} />
-      </Routes>
+      <div className="App"> {/* ヘッダーの下に余白を作る */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/:fighterSlug" element={<FighterDetail />} />
+          <Route path="/analysis" element={<Analysis />} />
+          <Route path="/quiz" element={<QuizHome />} />
+          <Route path="/quiz/play" element={<QuizPlay />} />
+          <Route path="/quiz/result" element={<QuizResult />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }
