@@ -94,11 +94,14 @@ const axisControlStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = {
   marginBottom: '5px',
+  paddingLeft: '14px',
   fontWeight: 600,
+  textAlign: "left",
 };
 
 const selectStyle: React.CSSProperties = {
   padding: '8px',
   // borderRadius: '6px', ← 削除
   border: '1px solid #ccc',
+  width: '120px', // 幅を固定
 };
