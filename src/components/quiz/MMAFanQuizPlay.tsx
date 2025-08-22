@@ -1,16 +1,22 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-type QuestionProps = {
-  question: string;
-  image: string;
-  options: string[];
-  correctAnswer: string;
-  onFinish: (isCorrect: boolean) => void;
+type Person = {
+  id: string;
+  name: string;
+  nickname: string;
+  imgUrl: string;
 };
 
-const Question: React.FC<QuestionProps> = ({ question, image, options, correctAnswer, onFinish }) => {
+type QuestionProps = {
+  person: Person;
+  options: string[];
+};
+
+const Question: React.FC<QuestionProps> = ({ person, options }) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
+  const navigate = useNavigate();
 
   const handleSelect = (option: string) => {
     if (!isAnswered) {
@@ -19,92 +25,100 @@ const Question: React.FC<QuestionProps> = ({ question, image, options, correctAn
     }
   };
 
-  const isCorrect = selected === correctAnswer;
+  const isCorrect = selected === person.nickname;
 
   return (
     <div
       style={{
         padding: "1rem",
-        margin: "2rem auto",
-        maxWidth: "600px",
+        margin: "2rem",
         border: "1px solid #ccc",
         borderRadius: "8px",
-        textAlign: "center",
+        display: "flex",
+        gap: "1rem",
+        alignItems: "flex-start",
       }}
     >
-      <h2>{question}</h2>
+      {/* 左側：問題と選択肢 */}
+      <div style={{ flex: 1, textAlign: "left" }}>
+        <h2>What is {person.name}'s nickname?</h2>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {options.map((option) => (
+            <li key={option} style={{ marginBottom: "0.5rem" }}>
+              <button
+                onClick={() => handleSelect(option)}
+                disabled={isAnswered}
+                style={{
+                  padding: "0.5rem 1rem",
+                  backgroundColor:
+                    isAnswered && option === person.nickname
+                      ? "lightgreen"
+                      : isAnswered && option === selected
+                        ? "salmon"
+                        : "#f0f0f0",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  cursor: isAnswered ? "default" : "pointer",
+                  minWidth: "200px",
+                }}
+              >
+                {option}
+              </button>
+            </li>
+          ))}
+        </ul>
 
-      <img
-        src={image}
-        alt="quiz"
-        style={{ width: "200px", borderRadius: "8px", margin: "1rem auto" }}
-      />
-
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {options.map((option) => (
-          <li key={option} style={{ marginBottom: "0.5rem" }}>
+        {isAnswered && (
+          <div style={{ marginTop: "1rem" }}>
+            <p>{isCorrect ? "✅ 正解!" : `❌ 不正解... 正解は ${person.nickname}`}</p>
             <button
-              onClick={() => handleSelect(option)}
-              disabled={isAnswered}
+              onClick={() => navigate("/quiz/")}
               style={{
                 padding: "0.5rem 1rem",
-                backgroundColor:
-                  isAnswered && option === correctAnswer
-                    ? "lightgreen"
-                    : isAnswered && option === selected
-                      ? "salmon"
-                      : "#f0f0f0",
-                border: "1px solid #ccc",
+                backgroundColor: "#007bff",
+                color: "white",
+                border: "none",
                 borderRadius: "4px",
-                cursor: isAnswered ? "default" : "pointer",
-                minWidth: "200px",
+                cursor: "pointer",
               }}
             >
-              {option}
+              ホームへ戻る
             </button>
-          </li>
-        ))}
-      </ul>
+          </div>
+        )}
+      </div>
 
-      {isAnswered && (
-        <div style={{ marginTop: "1rem" }}>
-          <p>{isCorrect ? "✅ 正解!" : `❌ 不正解... 正解は ${correctAnswer}`}</p>
-          <button
-            onClick={() => onFinish(isCorrect)}
-            style={{
-              padding: "0.5rem 1rem",
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              marginTop: "0.5rem",
-            }}
-          >
-            Finish Quiz
-          </button>
-        </div>
-      )}
+      {/* 右側：画像 */}
+      <img
+        src={person.imgUrl}
+        alt={person.name}
+        style={{
+          width: "150px",
+          borderRadius: "8px",
+          flexShrink: 0,
+          marginTop: "5rem",
+        }}
+      />
     </div>
   );
 };
 
-export const SingleNicknameQuiz: React.FC = () => {
-  const question = "What is my nickname?";
-  const correctAnswer = "C言語戦士";
+export const MMAFanNicknameQuizPlay: React.FC = () => {
+  const person: Person = {
+    id: "1",
+    name: "Yoshiharu Mukaiyama",
+    nickname: "C言語戦士",
+    imgUrl: "/assets/images/PhotoOfMyself.png",
+  };
+
   const options = ["C言語戦士", "同期Lover", "圧倒的行動家", "七対の雀士"].sort(
     () => 0.5 - Math.random()
   );
 
   return (
     <Question
-      question={question}
-      image="/assets/images/PhotoOfMyself.png" // ← ここに自分の画像を配置
+      person={person}
       options={options}
-      correctAnswer={correctAnswer}
-      onFinish={(isCorrect) => {
-        alert(isCorrect ? "🎉 おめでとう！" : "💀 残念...");
-      }}
     />
   );
 };
