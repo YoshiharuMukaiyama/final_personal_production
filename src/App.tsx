@@ -6,8 +6,10 @@ import { Home } from './components/home';
 import { FighterDetail } from './components/Detail/fightersDetail';
 import { Analysis } from './components/analysis';
 import { QuizHome } from './components/quiz/quizHome';
-import { QuizPlay } from './components/quiz/quizPlay';
-import { QuizResult } from './components/quiz/quizResult';
+import { NicknameQuizPlay } from './components/quiz/nicknameQuizPlay';
+import { NicknameQuizResult } from './components/quiz/nicknameQuizResult';
+import { TattooQuizPlay } from './components/quiz/tattooQuizPlay';
+import { TattooQuizResult } from './components/quiz/tattooQuizResult';
 
 export default function App() {
   return (
@@ -19,8 +21,10 @@ export default function App() {
           <Route path="/:fighterSlug" element={<FighterDetail />} />
           <Route path="/analysis" element={<Analysis />} />
           <Route path="/quiz" element={<QuizHome />} />
-          <Route path="/quiz/play" element={<QuizPlay />} />
-          <Route path="/quiz/result" element={<QuizResult />} />
+          <Route path="/quiz/play_nickname" element={<NicknameQuizPlay />} />
+          <Route path="/quiz/result_nickname" element={<NicknameQuizResult />} />
+          <Route path="/quiz/play_tattoo" element={<TattooQuizPlay />} />
+          <Route path="/quiz/result_tattoo" element={<TattooQuizResult />} />
         </Routes>
       </div>
     </BrowserRouter>
